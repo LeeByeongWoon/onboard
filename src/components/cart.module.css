@@ -1,0 +1,7 @@
+.outOfStock {
+    color: lightgray;
+
+    div {
+        text-decoration-line: line-through;
+    }
+}

@@ -1,5 +1,4 @@
-import LoopToPure from "./LoopToPure.ts";
-
+import LoopToPure from '@/KnowledgeBase/sideEffect/LoopToPure.ts';
 
 describe('sumInRange', () => {
     test('calculates the sum of numbers within a range', () => {
