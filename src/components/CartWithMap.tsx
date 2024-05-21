@@ -6,7 +6,7 @@ import { CART_DATA, CartItem } from '@/mock/cartData.ts';
     - 재고가 없는 아이템
  */
 const StockItem = (item: CartItem) => (
-    <li className={item.outOfStock ? styles.outOfStock : undefined}>
+    <li className={item.outOfStock ? styles.outOfStock : undefined} key={item.code}>
         <h2 style={{ display: 'contents' }}>
             {item.name} {item.outOfStock && '(품절)'}
         </h2>
@@ -39,5 +39,14 @@ const TotalPrice = SumComponent(CART_DATA, itemPrice, '전체 가격');
 const List = (cartData: CartItem[]) => cartData.map(StockItem);
 
 export function CartWithMap() {
-    return [<h1>장바구니</h1>, ...List(CART_DATA), <br />, TotalCount, <br />, TotalPrice];
+    return (
+        <>
+            <h1>장바구니</h1>
+            {...List(CART_DATA)}
+            <br />
+            {TotalCount}
+            <br />
+            {TotalPrice}
+        </>
+    );
 }
