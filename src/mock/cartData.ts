@@ -1,9 +1,10 @@
 export interface CartItem {
-    code: string;
-    outOfStock: boolean;
-    name: string;
-    price: number;
-    quantity: number;
+    readonly code: string;
+    readonly outOfStock: boolean;
+    readonly name: string;
+    readonly price: number;
+    readonly quantity: number;
+    readonly discountPrice?: number;
 }
 
 export type CartData = CartItem[];
@@ -15,6 +16,7 @@ export const CART_DATA: CartData = [
         name: '토마토',
         price: 7000,
         quantity: 2,
+        discountPrice: 1000,
     },
     {
         code: 'orange',
@@ -22,6 +24,7 @@ export const CART_DATA: CartData = [
         name: '오렌지',
         price: 15000,
         quantity: 3,
+        discountPrice: 2000,
     },
     {
         code: 'apple',

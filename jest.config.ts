@@ -107,7 +107,7 @@ const config: Config = {
     // Run tests from one or more projects
     // projects: undefined,
 
-    // Use this configuration option to add custom reporters to Jest
+    // Use this configuration optional to add custom reporters to Jest
     // reporters: undefined,
 
     // Automatically reset mock state before every test
@@ -168,10 +168,10 @@ const config: Config = {
     // The regexp pattern or array of patterns that Jest uses to detect test files
     // testRegex: [],
 
-    // This option allows the use of a custom results processor
+    // This optional allows the use of a custom results processor
     // testResultsProcessor: undefined,
 
-    // This option allows use of a custom test runner
+    // This optional allows use of a custom test runner
     // testRunner: "jest-circus/runner",
 
     // A customMap from regular expressions to paths to transformers
