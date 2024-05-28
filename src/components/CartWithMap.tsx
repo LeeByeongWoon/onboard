@@ -2,7 +2,7 @@ import styles from '@/components/cart.module.css';
 import * as T from '@/KnowledgeBase/errorHandling/error1.ts';
 import * as O from '@/KnowledgeBase/optional/option.ts';
 import { mapOrElse } from '@/KnowledgeBase/optional/option.ts';
-import { CART_DATA, CartData, CartItem } from '@/mock/cartData.ts';
+import { CART_DATA, CartItem } from '@/mock/cartData.ts';
 /*
     아이템 목록 화면
     - 재고가 있는 아이템
@@ -10,11 +10,11 @@ import { CART_DATA, CartData, CartItem } from '@/mock/cartData.ts';
  */
 
 type ParsedItem = { _tag: 'parsedItem' } & CartItem;
-
 type ParseError = {
     name: string;
     message: string;
 };
+type ArrayItem = T.Try<ParseError, ParsedItem>[];
 
 const parseItem = (item: CartItem): T.Try<ParseError, ParsedItem> => {
     if (item.quantity < 1) {
@@ -33,6 +33,8 @@ const parseItem = (item: CartItem): T.Try<ParseError, ParsedItem> => {
         ...item,
     });
 };
+
+const parsedList = CART_DATA.map(parseItem);
 
 const discount = <T,>(price: T | undefined, defaultValue: T) => {
     return O.getOrElse(O.toOption(price), defaultValue);
@@ -87,37 +89,55 @@ const isNotCauseError = (item: CartItem) => {
     }
 };
 
-const SumComponent = (list: CartItem[], f: (prev: number, current: CartItem) => number, label: string, optionLabel?: string) => {
+const SumComponent = (list: ArrayItem, f: (prev: number, current: CartItem) => number, label: string) => {
     return (
         <>
-            {label}: {list.filter(isNotOutOfStock).filter(isNotCauseError).reduce(f, 0)} {optionLabel}
+            {label}: {T.keepSuccess(list).filter(isNotOutOfStock).reduce(f, 0)}
         </>
     );
 };
 
-const totalDiscountPrice = (cartData: CartData) => {
-    const discountPrice = cartData
+const totalDiscountPrice = (cartData: ArrayItem) => {
+    const calcDisCount = (previousValue: number, currentValue: ParsedItem) =>
+        previousValue + (currentValue.discountPrice ?? 0) * currentValue.quantity;
+
+    const discountPrice = T.keepSuccess(cartData)
         .filter(isNotOutOfStock)
         .filter(isDiscountPrice)
         .filter(isNotCauseError)
-        .reduce((previousValue, currentValue) => previousValue + (currentValue.discountPrice ?? 0) * currentValue.quantity, 0);
+        .reduce(calcDisCount, 0);
     return `(${discountPrice}원 할인)`;
 };
 
-const TotalCount = SumComponent(CART_DATA, itemCount, '전체 수량');
-const TotalPrice = SumComponent(CART_DATA, itemPrice, '전체 가격', totalDiscountPrice(CART_DATA));
+const TotalComponent = (list: ArrayItem) => {
+    const TotalCount = SumComponent(list, itemCount, '전체 수량');
+    const TotalPrice = SumComponent(list, itemPrice, '전체 가격');
+    const disCountPrice = totalDiscountPrice(parsedList);
+    return (
+        <>
+            {TotalCount}
+            <br />
+            {TotalPrice}
+            {disCountPrice}
+        </>
+    );
+};
 
-const List = (cartData: CartItem[]) => cartData.map(StockItem);
+const List = (list: ArrayItem) =>
+    list.map((item) =>
+        T.getOrElse(
+            T.tryMap(item, (parseItem) => StockItem(parseItem)),
+            errorItem
+        )
+    );
 
 export function CartWithMap() {
     return (
         <>
             <h1>장바구니</h1>
-            {...List(CART_DATA)}
+            {...List(parsedList)}
             <br />
-            {TotalCount}
-            <br />
-            {TotalPrice}
+            {TotalComponent(parsedList)}
         </>
     );
 }

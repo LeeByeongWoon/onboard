@@ -50,3 +50,9 @@ export const tryMap = <E, A, B>(ta: Try<E, A>, f: (a: A) => B): Try<E, B> => {
     if (isFailed(ta)) return ta;
     return success(f(ta.result));
 };
+
+// Array<T.Try<ParseError, ParsedItem>> => Array<ParsedItem>
+export const keepSuccess = <E, R>(tas: Array<Try<E, R>>): Array<R> => {
+    return tas.flatMap((ta) => (isSuccess(ta) ? [ta.result] : [])); // 가독성은 좀 떨어지나 성능에 이점이 있음.
+    // return tas.filter(isSuccess).map((item) => item.result); //가독성이 높으나 배열 두번 순환으로 성능 이슈.
+};
