@@ -31,10 +31,13 @@ const parseItem = (item: CartItem): T.Try<ParseError, ParsedItem> => {
     return T.success({
         _tag: 'parsedItem',
         ...item,
-    });
+    }); // { _tag:'success', result: { _tag: 'parsedItem', ...item }}
 };
 
 const parsedList = CART_DATA.map(parseItem);
+//({ _tag:'failed', error: { name: item.name, message: 'error message' }} || { _tag:'success', result: { _tag: 'parsedItem', ...item }})[]
+// Array<>
+// === Array<Try<E,R>>
 
 const discount = <T,>(price: T | undefined, defaultValue: T) => {
     return O.getOrElse(O.toOption(price), defaultValue);

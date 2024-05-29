@@ -52,7 +52,30 @@ export const tryMap = <E, A, B>(ta: Try<E, A>, f: (a: A) => B): Try<E, B> => {
 };
 
 // Array<T.Try<ParseError, ParsedItem>> => Array<ParsedItem>
+// 선언적 방식
 export const keepSuccess = <E, R>(tas: Array<Try<E, R>>): Array<R> => {
     return tas.flatMap((ta) => (isSuccess(ta) ? [ta.result] : [])); // 가독성은 좀 떨어지나 성능에 이점이 있음.
     // return tas.filter(isSuccess).map((item) => item.result); //가독성이 높으나 배열 두번 순환으로 성능 이슈.
+};
+
+//명령적 방식
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const keepSuccessWithFor = <E, R>(tas: Array<Try<E, R>>): Array<R> => {
+    const arr: Array<R> = [];
+    for (const ta of tas) {
+        if (isSuccess(ta)) {
+            arr.push(ta.result);
+        }
+    }
+    return arr;
+};
+
+// flat :: Try<E,Try<E, A>> => Try<E, A>
+const flat = <E, A>(tta: Try<E, Try<E, A>>): Try<E, A> => {
+    if (tta._tag === 'success') return tta.result;
+    return tta;
+};
+
+export const tryFlatMap = <E, A, B>(ta: Try<E, A>, f: (a: A) => Try<E, B>): Try<E, B> => {
+    return flat(tryMap(ta, f));
 };
